@@ -1,7 +1,7 @@
 import mongoose, { model, Schema } from 'mongoose';
-import { ICodeAssistantConversation } from '../types/code-assistant.types';
+import { IContentGeneratorConversation } from '../types/content-generator.types';
 
-const codeAssistantSchema = new Schema<ICodeAssistantConversation>(
+const contentGeneratorSchema = new Schema<IContentGeneratorConversation>(
   {
     title: { type: String, required: false },
     user: {
@@ -24,7 +24,7 @@ const codeAssistantSchema = new Schema<ICodeAssistantConversation>(
   { timestamps: true },
 );
 
-export const CodeAssistant = model<ICodeAssistantConversation>(
-  'CodeAssistant',
-  codeAssistantSchema,
+export const ContentGenerator = model<IContentGeneratorConversation>(
+  'ContentGenerator',
+  contentGeneratorSchema,
 );

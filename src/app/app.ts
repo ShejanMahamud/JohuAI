@@ -6,7 +6,7 @@ import Groq from 'groq-sdk';
 import path from 'path';
 import { ZodError } from 'zod';
 import config from '../config';
-import conversationRoutes from '../routes/code-assistant.routes';
+import botsRoutes from '../routes/bots.routes';
 import userRoutes from '../routes/user.routes';
 import { ErrorWithStatus } from '../types/types';
 import { CustomError } from '../utils/customError';
@@ -79,7 +79,7 @@ app.get('/image-info', async (req: Request, res: Response) => {
 });
 
 app.use('/v1/api/users', userRoutes);
-app.use('/v1/api/bots', conversationRoutes);
+app.use('/v1/api/bots', botsRoutes);
 
 // Handle 404 errors
 app.use((req, res, next) => {
