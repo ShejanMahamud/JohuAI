@@ -1,8 +1,18 @@
 import mongoose, { model, Schema } from 'mongoose';
-import { IContentGeneratorConversation } from '../types/content-generator.types';
+import { IBotConversation } from '../types/bot.types';
 
-const contentGeneratorSchema = new Schema<IContentGeneratorConversation>(
+const botConversationSchema = new Schema<IBotConversation>(
   {
+    botId: {
+      type: String,
+      enum: [
+        'code-assistant',
+        'text-translator',
+        'content-generator',
+        'text-summarizer',
+      ],
+      required: true,
+    },
     title: { type: String, required: false },
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -24,7 +34,7 @@ const contentGeneratorSchema = new Schema<IContentGeneratorConversation>(
   { timestamps: true },
 );
 
-export const ContentGenerator = model<IContentGeneratorConversation>(
-  'ContentGenerator',
-  contentGeneratorSchema,
+export const BotConversation = model<IBotConversation>(
+  'BotConversation',
+  botConversationSchema,
 );

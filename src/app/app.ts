@@ -1,18 +1,18 @@
 import cors from 'cors';
 import type { Application, NextFunction, Request, Response } from 'express';
 import express from 'express';
-import fs from 'fs';
 import Groq from 'groq-sdk';
-import path from 'path';
+import multer from 'multer';
 import { ZodError } from 'zod';
 import config from '../config';
 import botsRoutes from '../routes/bots.routes';
+import toolsRoutes from '../routes/tools.routes';
 import userRoutes from '../routes/user.routes';
 import { ErrorWithStatus } from '../types/types';
 import { CustomError } from '../utils/customError';
 export const groq = new Groq({ apiKey: config.groqAIkey });
+export const upload = multer({ storage: multer.memoryStorage() });
 const app: Application = express();
-
 app.use(express.json());
 app.use(
   cors({
@@ -25,23 +25,6 @@ app.use(
 
 app.get('/', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Server is Running! 🏃' });
-});
-
-app.get('/audio', async (req: Request, res: Response) => {
-  const filePath = path.join(process.cwd(), './src/app/6231.mp3');
-  const translation = await groq.audio.transcriptions.create({
-    file: fs.createReadStream(filePath), // Required path to audio file - replace with your audio file!
-    model: 'whisper-large-v3', // Required model to use for translation
-    prompt: 'Specify context or spelling', // Optional
-    response_format: 'json', // Optional
-    temperature: 0.0, // Optional
-  });
-  // Log the transcribed text
-  console.log(translation.text);
-  res.json({
-    success: true,
-    message: translation.text,
-  });
 });
 
 app.get('/image-info', async (req: Request, res: Response) => {
@@ -57,7 +40,7 @@ app.get('/image-info', async (req: Request, res: Response) => {
           {
             type: 'image_url',
             image_url: {
-              url: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/LPU-v1-die.jpg',
+              url: 'https://i.ibb.co.com/BNsGYwB/frontend-shejan-mahamud-resume-2-page-0001.jpg',
             },
           },
         ],
@@ -71,7 +54,7 @@ app.get('/image-info', async (req: Request, res: Response) => {
     stop: null,
   });
 
-  console.log(chatCompletion.choices[0].message.content);
+  console.log(chatCompletion);
   res.json({
     success: true,
     message: chatCompletion.choices[0].message.content,
@@ -80,6 +63,7 @@ app.get('/image-info', async (req: Request, res: Response) => {
 
 app.use('/v1/api/users', userRoutes);
 app.use('/v1/api/bots', botsRoutes);
+app.use('/v1/api/tools', toolsRoutes);
 
 // Handle 404 errors
 app.use((req, res, next) => {

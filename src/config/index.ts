@@ -10,4 +10,5 @@ export default {
   jwtSecret: process.env.ACCESS_TOKEN || '',
   openAiApiKey: process.env.OPENAI_API_KEY || '',
   groqAIkey: process.env.GROQ_API_KEY || '',
+  clipDropKey: process.env.CLIPDROP_API_KEY || '',
 };
