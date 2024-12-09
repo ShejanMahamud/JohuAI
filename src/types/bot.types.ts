@@ -14,4 +14,10 @@ export interface IBotConversation {
     | 'text-summarizer';
   user: mongoose.Schema.Types.ObjectId;
   messages: IBotMessage[];
+  meta: {
+    model?: string;
+    tone?: string;
+    temperature?: number;
+    language?: string;
+  };
 }

@@ -1,19 +1,20 @@
+import CookieParser from 'cookie-parser';
 import cors from 'cors';
 import type { Application, NextFunction, Request, Response } from 'express';
 import express from 'express';
-import Groq from 'groq-sdk';
-import multer from 'multer';
 import { ZodError } from 'zod';
 import config from '../config';
+import { groq } from '../helpers/constants';
+import authRoutes from '../routes/auth.routes';
 import botsRoutes from '../routes/bots.routes';
 import toolsRoutes from '../routes/tools.routes';
 import userRoutes from '../routes/user.routes';
-import { ErrorWithStatus } from '../types/types';
+import { ErrorWithStatus } from '../types/global';
 import { CustomError } from '../utils/customError';
-export const groq = new Groq({ apiKey: config.groqAIkey });
-export const upload = multer({ storage: multer.memoryStorage() });
+
 const app: Application = express();
 app.use(express.json());
+app.use(CookieParser());
 app.use(
   cors({
     origin: [config.clientUrl || ''],
@@ -61,7 +62,8 @@ app.get('/image-info', async (req: Request, res: Response) => {
   });
 });
 
-app.use('/v1/api/users', userRoutes);
+app.use('/v1/api/auth', authRoutes);
+app.use('/v1/api/user', userRoutes);
 app.use('/v1/api/bots', botsRoutes);
 app.use('/v1/api/tools', toolsRoutes);
 

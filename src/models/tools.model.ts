@@ -10,6 +10,9 @@ const toolsSchema = new Schema<ITools>({
       'transcribe-audio',
       'sketch-to-image',
       'text-to-image',
+      'ai-detector',
+      'code-generator',
+      'text-to-speech',
     ],
     required: true,
   },
@@ -18,11 +21,13 @@ const toolsSchema = new Schema<ITools>({
     ref: 'User',
     required: true,
   },
-  message: {
+  response: {
     text: { type: String },
     image: { type: String },
+    file: { type: String },
+    json: { type: Schema.Types.Mixed },
   },
-  prompt: { type: String },
+  meta: { type: Schema.Types.Mixed },
 });
 
 export const Tools = model<ITools>('Tools', toolsSchema);

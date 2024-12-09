@@ -7,3 +7,7 @@ declare global {
     }
   }
 }
+
+export interface ErrorWithStatus extends Error {
+  status?: number;
+}

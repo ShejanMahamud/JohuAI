@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 
-export interface IMessage {
+export interface IResponse {
   text?: string;
   image?: string;
+  file?: string;
+  json?: Record<string, unknown>;
 }
 
 export interface ITools {
@@ -11,8 +13,12 @@ export interface ITools {
     | 'translate-audio'
     | 'transcribe-audio'
     | 'sketch-to-image'
-    | 'text-to-image';
+    | 'text-to-image'
+    | 'ai-detector'
+    | 'code-generator'
+    | 'text-to-speech';
   user: mongoose.Schema.Types.ObjectId;
-  message: IMessage;
+  response: IResponse;
   prompt?: string;
+  meta?: Record<string, unknown>;
 }

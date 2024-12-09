@@ -1,51 +1,55 @@
-import bcrypt from 'bcrypt';
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import config from '../config';
-import User from '../models/user.model';
+import { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { UserModel } from '../models/user.model';
+import { sendResponse } from '../utils/responseHandler';
 
-export const registerUser = async (req: Request, res: Response) => {
-  try {
-    const { name, email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword });
-    await user.save();
-    res
-      .status(201)
-      .json({ success: true, message: 'User registered successfully' });
-  } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        error: (error as Error).message || 'Error registering user',
-      });
-  }
-};
-
-export const loginUser = async (
+export const getAllUsers = async (
   req: Request,
   res: Response,
-): Promise<Response> => {
+  next: NextFunction,
+) => {
   try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ error: 'User not found' });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
-
-    const token = jwt.sign({ id: user._id }, config.jwtSecret, {
-      expiresIn: '1h',
-    });
-    return res.json({ success: true, token });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({
+    // Get all users from the database
+    const users = await UserModel.find().sort({ createdAt: -1 });
+    if (!users) {
+      return sendResponse(res, {
+        status: StatusCodes.NOT_FOUND,
         success: false,
-        error: (error as Error).message || 'Error logging in',
+        message: 'Users not found',
       });
+    }
+    return sendResponse(res, {
+      status: StatusCodes.OK,
+      success: true,
+      message: 'Users fetched successfully',
+      data: users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export const getAUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // Get a user from the database
+    const user = await UserModel.findById(req.params.id);
+    if (!user) {
+      return sendResponse(res, {
+        status: StatusCodes.NOT_FOUND,
+        success: false,
+        message: 'User not found',
+      });
+    }
+    return sendResponse(res, {
+      status: StatusCodes.OK,
+      success: true,
+      message: 'Users fetched successfully',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
   }
 };

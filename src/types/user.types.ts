@@ -7,4 +7,6 @@ export interface IUser {
   phone: string;
   tokenUsed: number;
   status: 'active' | 'inactive';
+  wordUsed: number;
+  refreshToken: string;
 }

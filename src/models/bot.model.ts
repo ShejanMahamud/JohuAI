@@ -13,7 +13,7 @@ const botConversationSchema = new Schema<IBotConversation>(
       ],
       required: true,
     },
-    title: { type: String, required: false },
+    title: { type: String, default: null },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -30,6 +30,12 @@ const botConversationSchema = new Schema<IBotConversation>(
         _id: false,
       },
     ],
+    meta: {
+      model: { type: String },
+      tone: { type: String },
+      temperature: { type: Number },
+      language: { type: String },
+    },
   },
   { timestamps: true },
 );
