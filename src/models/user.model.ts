@@ -13,8 +13,9 @@ const userSchema = new Schema<IUser>(
     wordUsed: { type: Number, default: 0 },
     refreshToken: { type: String, required: false },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+    profile_picture: { type: String, required: true },
   },
   { timestamps: true },
 );
 
-export const UserModel = mongoose.model<IUser>('UserModel', userSchema);
+export const UserModel = mongoose.model<IUser>('Users', userSchema);

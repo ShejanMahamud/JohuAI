@@ -2,6 +2,7 @@ import CookieParser from 'cookie-parser';
 import cors from 'cors';
 import type { Application, NextFunction, Request, Response } from 'express';
 import express from 'express';
+import passport from 'passport';
 import { ZodError } from 'zod';
 import config from '../config';
 import { groq } from '../helpers/constants';
@@ -15,6 +16,8 @@ import { CustomError } from '../utils/customError';
 const app: Application = express();
 app.use(express.json());
 app.use(CookieParser());
+// initializePassport();
+app.use(passport.initialize());
 app.use(
   cors({
     origin: [config.clientUrl || ''],
@@ -91,6 +94,7 @@ app.use(
     }
 
     console.error('🛑 Error: ' + errorMessage);
+    console.error('🛑 Error Stack: ' + error.stack);
     if (res.headersSent) {
       return next(error);
     }

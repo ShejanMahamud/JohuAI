@@ -13,9 +13,14 @@ export const registerUser = async (
   next: NextFunction,
 ) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, profile_picture } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new UserModel({ name, email, password: hashedPassword });
+    const user = new UserModel({
+      name,
+      email,
+      password: hashedPassword,
+      profile_picture,
+    });
     await user.save();
     return sendResponse(res, {
       status: StatusCodes.OK,
@@ -57,7 +62,14 @@ export const loginUser = async (
     );
     user.refreshToken = refreshToken;
     await user.save();
-    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true });
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
     return sendResponse(res, {
       success: true,
       message: 'Login successful!',
@@ -75,28 +87,26 @@ export const googleLoginSuccess = async (
   next: NextFunction,
 ) => {
   try {
-    // Ensure user data exists in the request
-    if (!req.user) {
+    const requestedUser = {
+      email: req.query.email,
+      accessToken: req.query.accessToken,
+      refreshToken: req.query.refreshToken,
+    };
+    if (!requestedUser) {
+      return sendResponse(res, {
+        status: StatusCodes.UNAUTHORIZED,
+        success: false,
+        error: 'User not found in request',
+      });
+    }
+
+    const user = await UserModel.findOne({ email: requestedUser?.email });
+
+    if (!user) {
       return sendResponse(res, {
         status: StatusCodes.UNAUTHORIZED,
         success: false,
         error: 'User not found',
-      });
-    }
-
-    const { accessToken, refreshToken, email } = req.user as {
-      accessToken: string;
-      refreshToken: string;
-      email: string;
-    };
-
-    const user = await UserModel.findOne({ email });
-
-    if (!user) {
-      return sendResponse(res, {
-        status: StatusCodes.NOT_FOUND,
-        success: false,
-        error: 'User not found in the database',
       });
     }
 
@@ -119,22 +129,30 @@ export const googleLoginSuccess = async (
     // Update the refresh token only if necessary
     if (shouldUpdateRefreshToken) {
       await UserModel.findOneAndUpdate(
-        { email },
-        { refreshToken },
+        { email: requestedUser.email },
+        { refreshToken: requestedUser.refreshToken },
         { new: true }, // Return the updated document (optional)
       );
     }
 
     // Set the access token as an HTTP-only cookie
-    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true });
+    res.cookie('accessToken', requestedUser?.accessToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    res.cookie('refreshToken', requestedUser?.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
 
     // Respond with the access token and a success message
-    return sendResponse(res, {
-      success: true,
-      message: 'Login successful!',
-      status: StatusCodes.OK,
-      data: { accessToken },
-    });
+    // return sendResponse(res, {
+    //   success: true,
+    //   message: 'Login successful!',
+    //   status: StatusCodes.OK,
+    //   data: { accessToken },
+    // });
+    res.redirect(`${config.clientUrl}`);
   } catch (error) {
     return next(error);
   }

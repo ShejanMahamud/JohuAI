@@ -8,4 +8,4 @@ const tokenSchema = new Schema<IToken>(
   },
   { timestamps: true },
 );
-export const TokenModel = mongoose.model<IToken>('TokenModel', tokenSchema);
+export const TokenModel = mongoose.model<IToken>('Tokens', tokenSchema);

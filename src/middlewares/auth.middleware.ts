@@ -67,7 +67,6 @@ const authenticateToken = async (
         res.cookie('accessToken', newAccessToken, {
           httpOnly: true,
           secure: true,
-          sameSite: 'strict',
         });
         req.user = { id: user._id, email: user.email, role: user.role };
         return next();
