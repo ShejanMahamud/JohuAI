@@ -14,6 +14,12 @@ const userSchema = new Schema<IUser>(
     refreshToken: { type: String, required: false },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     profile_picture: { type: String, required: true },
+    login_method: {
+      type: String,
+      enum: ['email', 'google', 'facebook'],
+      default: 'email',
+    },
+    email_verified: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

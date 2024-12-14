@@ -10,7 +10,9 @@ export const getAllUsers = async (
 ) => {
   try {
     // Get all users from the database
-    const users = await UserModel.find().sort({ createdAt: -1 });
+    const users = await UserModel.find()
+      .sort({ createdAt: -1 })
+      .select('-password');
     if (!users) {
       return sendResponse(res, {
         status: StatusCodes.NOT_FOUND,
@@ -35,7 +37,7 @@ export const getAUser = async (
 ) => {
   try {
     // Get a user from the database
-    const user = await UserModel.findById(req.params.id);
+    const user = await UserModel.findById(req.params.id).select('-password');
     if (!user) {
       return sendResponse(res, {
         status: StatusCodes.NOT_FOUND,

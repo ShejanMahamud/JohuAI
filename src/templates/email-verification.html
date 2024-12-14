@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+        background: #f9faff;
+        color: #333;
+      }
+
+      .email-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Header */
+      .email-header {
+        background: linear-gradient(
+          94deg,
+          #dd00ac 10.66%,
+          #7130c3 53.03%,
+          #410093 96.34%,
+          rgba(255, 0, 238, 0.26) 191.41%,
+          rgba(255, 59, 212, 0) 191.43%
+        );
+        padding: 20px 30px;
+        text-align: center;
+        color: #fff;
+      }
+
+      .email-header h1 {
+        font-size: 24px;
+        margin: 0;
+        color: white;
+        font-weight: bold;
+      }
+
+      .email-header p {
+        margin: 0;
+        font-size: 14px;
+        opacity: 0.9;
+        color: white;
+      }
+
+      /* Body */
+      .email-body {
+        padding: 30px;
+        font-size: 16px;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .email-body p {
+        margin-bottom: 20px;
+      }
+
+      .otp-box {
+        display: inline-block;
+        background: #f0f8ff;
+        border: 2px dashed #0078ff;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 28px;
+        font-weight: bold;
+        color: #0078ff;
+        letter-spacing: 5px;
+        margin: 20px 0;
+      }
+
+      .help-text {
+        font-size: 14px;
+        color: #666;
+        margin-top: 10px;
+      }
+
+      .email-footer {
+        background: #f4f4f4;
+        padding: 20px;
+        text-align: center;
+        font-size: 13px;
+        color: #777;
+        border-top: 1px solid #eee;
+      }
+
+      .email-footer a {
+        color: #0078ff;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .cta-button {
+        display: inline-block;
+        margin: 20px 0;
+        padding: 12px 25px;
+        background: linear-gradient(
+          94deg,
+          #dd00ac 10.66%,
+          #7130c3 53.03%,
+          #410093 96.34%,
+          rgba(255, 0, 238, 0.26) 191.41%,
+          rgba(255, 59, 212, 0) 191.43%
+        );
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .cta-button:hover {
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <!-- Header -->
+      <div class="email-header">
+        <h1>Welcome to Johu AI</h1>
+        <p>Your AI Assistant for Smarter Solutions</p>
+      </div>
+
+      <!-- Body -->
+      <div class="email-body">
+        <p>Hello <strong>{{name}}</strong>,</p>
+        <p>
+          We're thrilled to have you! Use the code below to verify your email
+          address:
+        </p>
+        <div class="otp-box">{{otp}}</div>
+        <p>The code is valid for the next <strong>10 minutes</strong>.</p>
+        <a
+          href="https://johuai.vercel.app/verify?email={{userEmail}}&code={{userOtp}}"
+          class="cta-button"
+          >Verify Now</a
+        >
+        <p class="help-text">
+          If you didn’t request this email, please ignore it or contact us at
+          <a href="mailto:ai.johuai@gmail.com">ai.johuai@gmail.com</a>.
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="email-footer">
+        <p>&copy; 2024 Johu AI. All rights reserved.</p>
+        <p>
+          Visit our website:
+          <a href="https://johuai.vercel.app">johuai.vercel.app</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

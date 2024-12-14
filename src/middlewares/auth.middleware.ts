@@ -67,6 +67,9 @@ const authenticateToken = async (
         res.cookie('accessToken', newAccessToken, {
           httpOnly: true,
           secure: true,
+          sameSite: 'strict',
+          maxAge: 24 * 60 * 60 * 1000,
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
         });
         req.user = { id: user._id, email: user.email, role: user.role };
         return next();

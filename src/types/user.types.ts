@@ -10,4 +10,6 @@ export interface IUser {
   status: 'active' | 'inactive';
   wordUsed: number;
   refreshToken: string;
+  email_verified: boolean;
+  login_method: 'email' | 'google' | 'github';
 }

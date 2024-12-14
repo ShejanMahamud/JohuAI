@@ -16,7 +16,7 @@ import { CustomError } from '../utils/customError';
 const app: Application = express();
 app.use(express.json());
 app.use(CookieParser());
-// initializePassport();
+
 app.use(passport.initialize());
 app.use(
   cors({
@@ -27,7 +27,7 @@ app.use(
   }),
 );
 
-app.get('/', (_req: Request, res: Response) => {
+app.get('/v1/api', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Server is Running! 🏃' });
 });
 
@@ -75,7 +75,6 @@ app.use((req, res, next) => {
   const error = new CustomError('Requested URL Not Found', 404);
   next(error);
 });
-
 //Global Error Handler
 app.use(
   (
