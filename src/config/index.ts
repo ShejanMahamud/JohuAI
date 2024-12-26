@@ -21,4 +21,6 @@ export default {
   serverUrl: process.env.SERVER_URL || '',
   gmailUser: process.env.GMAIL_USER || '',
   gmailPassword: process.env.GMAIL_PASS || '',
+  geminiApiKey: process.env.GEMINI_API_KEY || '',
+  toolhouseApiKey: process.env.TOOL_HOUSE_API_KEY || '',
 };

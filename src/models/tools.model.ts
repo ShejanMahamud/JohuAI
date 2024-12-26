@@ -13,6 +13,8 @@ const toolsSchema = new Schema<ITools>({
       'ai-detector',
       'code-generator',
       'text-to-speech',
+      'web-searcher',
+      'object-remover',
     ],
     required: true,
   },

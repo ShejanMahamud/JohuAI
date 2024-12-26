@@ -12,4 +12,5 @@ router.post('/code-assistant', codeAssistant);
 router.post('/content-generator', contentGenerator);
 router.post('/text-translator', textTranslator);
 router.post('/text-summarizer', textSummarizer);
+
 export default router;

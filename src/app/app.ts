@@ -1,3 +1,4 @@
+import { generateText } from 'ai';
 import CookieParser from 'cookie-parser';
 import cors from 'cors';
 import type { Application, NextFunction, Request, Response } from 'express';
@@ -5,14 +6,14 @@ import express from 'express';
 import passport from 'passport';
 import { ZodError } from 'zod';
 import config from '../config';
-import { groq } from '../helpers/constants';
+import { google, groq } from '../helpers/constants';
+import aiAssistantRoutes from '../routes/ai-assistant.routes';
 import authRoutes from '../routes/auth.routes';
 import botsRoutes from '../routes/bots.routes';
 import toolsRoutes from '../routes/tools.routes';
 import userRoutes from '../routes/user.routes';
 import { ErrorWithStatus } from '../types/global';
 import { CustomError } from '../utils/customError';
-
 const app: Application = express();
 app.use(express.json());
 app.use(CookieParser());
@@ -20,7 +21,7 @@ app.use(CookieParser());
 app.use(passport.initialize());
 app.use(
   cors({
-    origin: [config.clientUrl || ''],
+    origin: [config.clientUrl],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -65,10 +66,34 @@ app.get('/image-info', async (req: Request, res: Response) => {
   });
 });
 
+app.post('/gemini', async (req: Request, res: Response) => {
+  try {
+    const { text } = await generateText({
+      model: google('gemini-1.5-pro-latest'),
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: 'What is an embedding model?',
+            },
+          ],
+        },
+      ],
+    });
+    console.log(text);
+    res.json(text);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 app.use('/v1/api/auth', authRoutes);
 app.use('/v1/api/user', userRoutes);
 app.use('/v1/api/bots', botsRoutes);
 app.use('/v1/api/tools', toolsRoutes);
+app.use('/v1/api/ai-assistant', aiAssistantRoutes);
 
 // Handle 404 errors
 app.use((req, res, next) => {

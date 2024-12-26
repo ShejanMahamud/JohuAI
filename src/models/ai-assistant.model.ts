@@ -1,17 +1,11 @@
 import mongoose, { model, Schema } from 'mongoose';
-import { IBotConversation } from '../types/bot.types';
+import { IAiAssistant } from '../types/ai-assistant.types';
 
-const botConversationSchema = new Schema<IBotConversation>(
+const aiAssistantSchema = new Schema<IAiAssistant>(
   {
     botId: {
       type: String,
-      enum: [
-        'code-assistant',
-        'text-translator',
-        'content-generator',
-        'text-summarizer',
-        'ai-assistant',
-      ],
+      enum: ['code-assistant', 'ai-assistant'],
       required: true,
     },
     title: { type: String, default: null },
@@ -27,21 +21,20 @@ const botConversationSchema = new Schema<IBotConversation>(
           enum: ['system', 'user', 'assistant'],
           required: true,
         },
-        content: { type: Schema.Types.Mixed, required: true },
+        content: { type: String, required: true },
         _id: false,
       },
     ],
     meta: {
       model: { type: String },
       tone: { type: String },
-      temperature: { type: Number },
       language: { type: String },
     },
   },
   { timestamps: true },
 );
 
-export const BotConversation = model<IBotConversation>(
-  'BotConversation',
-  botConversationSchema,
+export const AiAssistantModel = model<IAiAssistant>(
+  'AiAssistant',
+  aiAssistantSchema,
 );

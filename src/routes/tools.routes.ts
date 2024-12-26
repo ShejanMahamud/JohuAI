@@ -3,12 +3,13 @@ import {
   aiDetector,
   articleGenerator,
   codeGenerator,
+  objectRemover,
   removeBackground,
   sketchToImage,
   textToImage,
-  textToSpeech,
   transcribeAudio,
   translateAudio,
+  webSearcher,
 } from '../controllers/tools.controllers';
 import { audioUpload, upload } from '../middlewares/upload.middleware';
 const router = express.Router();
@@ -21,5 +22,10 @@ router.post('/text-to-image', textToImage);
 router.post('/ai-detector', aiDetector);
 router.post('/article-generator', articleGenerator);
 router.post('/code-generator', codeGenerator);
-router.post('/text-to-speech', textToSpeech);
+router.post(
+  '/object-remover',
+  upload.fields([{ name: 'image_file' }, { name: 'mask_file' }]),
+  objectRemover,
+);
+router.post('/web-searcher', webSearcher);
 export default router;

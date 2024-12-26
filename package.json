@@ -17,7 +17,10 @@
   "license": "ISC",
   "description": "This is a starter template for Express.js with TypeScript and MongoDB using Mongoose. It includes ESLint, Prettier, and dotenv. It also includes a basic user authentication system using JWT. This template built with express-ts-starter-cli.",
   "dependencies": {
+    "@ai-sdk/google": "^1.0.11",
     "@google/generative-ai": "^0.21.0",
+    "@toolhouseai/sdk": "^1.0.4",
+    "ai": "^4.0.20",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
@@ -39,6 +42,7 @@
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
     "passport-google-oidc": "^0.1.0",
+    "sharp": "^0.33.5",
     "uuid4": "^2.0.3",
     "uuidv4": "^6.2.13",
     "zod": "^3.23.8"

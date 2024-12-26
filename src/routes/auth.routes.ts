@@ -3,6 +3,7 @@ import {
   loginUser,
   logoutUser,
   registerUser,
+  sendOtp,
   verifyOtp,
 } from '../controllers/auth.controller';
 import { configureOAuthRoutes } from '../helpers/configureAuthRoutes';
@@ -15,6 +16,7 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
 router.post('/verify-otp', verifyOtp);
+router.post('/send-otp', sendOtp);
 // Configure Google OAuth routes
 configureOAuthRoutes(router, 'google', ['profile', 'email']);
 

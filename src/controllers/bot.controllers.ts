@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { groq } from '../app/app';
+import { groq } from '../helpers/constants';
 import { BotConversation } from '../models/bot.model';
 
 export const codeAssistant = async (req: Request, res: Response) => {

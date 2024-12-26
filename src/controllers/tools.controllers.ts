@@ -1,10 +1,12 @@
+import { generateText } from 'ai';
 import axios from 'axios';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import FormData from 'form-data';
 import fs from 'fs';
 import path from 'path';
-import { elevenlabs, groq } from '../app/app';
+import sharp from 'sharp';
 import config from '../config';
+import { google, groq } from '../helpers/constants';
 import { Tools } from '../models/tools.model';
 
 export const transcribeAudio = async (req: Request, res: Response) => {
@@ -166,18 +168,37 @@ export const sketchToImage = async (req: Request, res: Response) => {
       });
     }
     const prompt = req.body.prompt;
+    const userId = req.body.userId;
     const imagePath = req.file.path;
-    const imageFile = fs.createReadStream(imagePath);
+    const squareImagePath = `${imagePath}-square.jpg`;
+    await sharp(imagePath)
+      .resize({
+        width: 512, // Set desired width and height
+        height: 512,
+        fit: 'cover', // Ensures the image is cropped if needed
+        position: 'center', // Centers the crop
+      })
+      .toFile(squareImagePath);
+    const imageFile = fs.createReadStream(squareImagePath);
+
+    if (!fs.existsSync(imagePath)) {
+      return res.json({
+        success: false,
+        message: 'File does not exist',
+      });
+    }
 
     const formData = new FormData();
-    formData.append('image_file', imageFile);
+    formData.append('sketch_file', imageFile);
     formData.append('prompt', prompt);
+
     const { data } = await axios.post(
       `${config.toolApiUrl}/sketch-to-image/v1/sketch-to-image`,
       formData,
       {
         headers: {
           'x-api-key': config.toolApiKey,
+          ...formData.getHeaders(),
         },
         responseType: 'arraybuffer',
       },
@@ -185,8 +206,8 @@ export const sketchToImage = async (req: Request, res: Response) => {
     const base64Image = Buffer.from(data, 'binary').toString('base64');
     const resultImage = `data:${req.file.mimetype};base64,${base64Image}`;
     const tool = await Tools.create({
-      toolId: 'bg-removal',
-      user: req.user,
+      toolId: 'sketch-to-image',
+      user: userId,
       message: {
         image: resultImage,
       },
@@ -204,6 +225,97 @@ export const sketchToImage = async (req: Request, res: Response) => {
       message: (error as Error).message,
       error,
     });
+  }
+};
+
+export const objectRemover = async (req: Request, res: Response) => {
+  try {
+    // Ensure userId is passed in request body
+    const userId = req.body.userId;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required.',
+      });
+    }
+    console.log9;
+    // Ensure both image and mask files are uploaded
+    const imagePath = req.files?.image_file?.[0]?.path;
+    const maskPath = req.files?.mask_file?.[0]?.path;
+
+    if (!imagePath || !maskPath) {
+      return res.status(400).json({
+        success: false,
+        message: 'Image and mask files are required.',
+      });
+    }
+
+    // Validate files exist on the server
+    if (!fs.existsSync(imagePath) || !fs.existsSync(maskPath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'One or more files do not exist.',
+      });
+    }
+
+    // Prepare image and mask file streams
+    const imageFile = fs.createReadStream(imagePath);
+    const maskFile = fs.createReadStream(maskPath);
+
+    // Prepare FormData for the external API
+    const formData = new FormData();
+    formData.append('image_file', imageFile);
+    formData.append('mask_file', maskFile);
+
+    // Call the external tool API to process the image
+    const { data } = await axios.post(
+      `${config.toolApiUrl}/cleanup/v1`,
+      formData,
+      {
+        headers: {
+          'x-api-key': config.toolApiKey,
+          ...formData.getHeaders(),
+        },
+        responseType: 'arraybuffer', // Expecting binary data from the API
+      },
+    );
+
+    // Convert the binary data to base64 string for embedding in the response
+    const base64Image = Buffer.from(data, 'binary').toString('base64');
+    const resultImage = `data:image/png;base64,${base64Image}`;
+
+    // Save the result to your database (assuming you're using a model called Tools)
+    const tool = await Tools.create({
+      toolId: 'object-remover',
+      user: userId,
+      message: {
+        image: resultImage,
+      },
+    });
+
+    await tool.save();
+
+    // Respond back with the result image in base64 format
+    res.status(200).json({
+      success: true,
+      message: 'Image processed successfully.',
+      data: resultImage,
+    });
+  } catch (error) {
+    console.error('Error in object remover:', error);
+
+    // Handle any errors by responding with appropriate status codes
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error.',
+      error: (error as Error).message,
+    });
+  } finally {
+    // Clean up uploaded files (if needed)
+    if (req.files?.image_file?.[0]?.path)
+      fs.unlinkSync(req.files.image_file[0].path);
+    if (req.files?.mask_file?.[0]?.path)
+      fs.unlinkSync(req.files.mask_file[0].path);
   }
 };
 
@@ -481,23 +593,41 @@ export const codeGenerator = async (req: Request, res: Response) => {
   }
 };
 
-export const textToSpeech = async (req: Request, res: Response) => {
+export const webSearcher = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    // const {prompt,voice_id} = req.body;
-    const voices = await elevenlabs.voices.getAll();
-    console.log(config.elevenLabsApiKey);
-    // console.log(voices);
-    const audio = await elevenlabs.generate({
-      voice: 'Bill',
-      text: 'Hello! 你好! Hola! नमस्ते! Bonjour! こんにちは! مرحبا! 안녕하세요! Ciao! Cześć! Привіт! வணக்கம்!',
-      model_id: 'eleven_multilingual_v2',
+    const result = await generateText({
+      model: google('gemini-1.5-flash'),
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: 'summarize this document?',
+            },
+            {
+              type: 'file',
+              data: fs.readFileSync(
+                path.join(process.cwd(), 'src/app', 'backend-resume.pdf'),
+              ),
+              mimeType: 'application/pdf',
+            },
+          ],
+        },
+      ],
     });
-    console.log(audio);
+    console.log('Generated Text:', result);
+
+    res.json({
+      success: true,
+      message: 'Web search successful',
+      data: result.text,
+    });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'An error occurred while generating speech.',
-      error: (error as Error).message,
-    });
+    next(error);
   }
 };
